@@ -3,6 +3,8 @@ const router = express.Router();
 const { client } = require("../../config/db");
 const { ObjectId } = require("mongodb");
 
+const bcrypt = require("bcryptjs");
+
 // Connect to the Users collection
 const UsersCollection = client.db("naziur_rahman").collection("Users");
 
@@ -13,6 +15,30 @@ router.get("/", async (req, res) => {
     res.status(200).json(users);
   } catch (err) {
     res.status(500).json({ error: "Failed to get users" });
+  }
+});
+
+// Get a user by phone number
+router.get("/Phone/:phone", async (req, res) => {
+  try {
+    const { phone } = req.params;
+
+    if (!phone) {
+      return res.status(400).json({ error: "Phone number is required" });
+    }
+
+    const user = await UsersCollection.findOne({ phone });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ error: "No user found with this phone number" });
+    }
+
+    res.status(200).json(user);
+  } catch (err) {
+    console.error("Error fetching user by phone:", err);
+    res.status(500).json({ error: "Failed to get user" });
   }
 });
 
@@ -65,32 +91,26 @@ router.post("/", async (req, res) => {
 });
 
 // Check phone and password for login
-router.post("/login", async (req, res) => {
+router.post("/Login", async (req, res) => {
   try {
     const { phone, password } = req.body;
 
-    if (!phone || !password) {
+    if (!phone || !password)
       return res
         .status(400)
         .json({ message: "Phone and password are required" });
-    }
 
-    // Check if user exists
     const user = await UsersCollection.findOne({ phone });
+    if (!user) return res.status(404).json({ message: "No match found" });
 
-    if (!user) {
-      return res.status(404).json({ message: "No match found" });
-    }
-
-    // Check password
-    if (user.password !== password) {
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch)
       return res.status(401).json({ message: "Password doesn't match" });
-    }
 
-    // If everything matches
-    res.status(200).json({ success: true, message: "Login successful" });
+    res
+      .status(200)
+      .json({ success: true, message: "Login successful", phone: user.phone });
   } catch (err) {
-    console.error("Error logging in:", err);
     res.status(500).json({ error: "Error during login" });
   }
 });
