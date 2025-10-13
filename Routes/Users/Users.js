@@ -64,6 +64,37 @@ router.get("/UserBasicInfoExistCheck/:phone", async (req, res) => {
   }
 });
 
+// Check if user's bank info exists
+router.get("/BankInfoExistCheck/:phone", async (req, res) => {
+  try {
+    const { phone } = req.params;
+
+    if (!phone) {
+      return res.status(400).json({ error: "Phone number is required" });
+    }
+
+    const user = await UsersCollection.findOne({ phone });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ error: "No user found with this phone number" });
+    }
+
+    // Check if BillInfo exists and has valid data
+    const bankInfo = user.BillInfo;
+    const bankInfoSubmitted =
+      Array.isArray(bankInfo) && bankInfo.length > 0
+        ? bankInfo.every((info) => Object.keys(info).length > 0)
+        : false;
+
+    res.status(200).json({ bankInfoSubmitted });
+  } catch (err) {
+    console.error("Error checking bank info:", err);
+    res.status(500).json({ error: "Failed to check bank info" });
+  }
+});
+
 // Get a user by phone number
 router.get("/Phone/:phone", async (req, res) => {
   try {
