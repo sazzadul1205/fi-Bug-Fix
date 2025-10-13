@@ -115,4 +115,31 @@ router.post("/Login", async (req, res) => {
   }
 });
 
+
+// PUT route to update user data by phone number
+router.put("/Phone/:phone", async (req, res) => {
+  try {
+    const { phone } = req.params;
+    const updateData = req.body;
+
+    if (!phone) {
+      return res.status(400).json({ error: "Phone number is required" });
+    }
+
+    const result = await UsersCollection.updateOne(
+      { phone },
+      { $set: updateData }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({ message: "User data updated successfully" });
+  } catch (err) {
+    console.error("Error updating user:", err);
+    res.status(500).json({ error: "Failed to update user" });
+  }
+});
+
 module.exports = router;
