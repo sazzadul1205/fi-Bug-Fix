@@ -18,6 +18,52 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Check if user's basic info exists
+router.get("/UserBasicInfoExistCheck/:phone", async (req, res) => {
+  try {
+    const { phone } = req.params;
+
+    if (!phone) {
+      return res.status(400).json({ error: "Phone number is required" });
+    }
+
+    const user = await UsersCollection.findOne({ phone });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ error: "No user found with this phone number" });
+    }
+
+    // List of required basic fields
+    const requiredFields = [
+      "name",
+      "fathers_name",
+      "mothers_name",
+      "nid_number",
+      "blood_group",
+      "permanent_address",
+      "temporary_address",
+      "job",
+      "nidFront",
+      "nidBack",
+      "passportPhoto",
+      "signature",
+    ];
+
+    // Check if all required fields exist and are not empty/null
+    const isComplete = requiredFields.every(
+      (field) =>
+        user[field] !== undefined && user[field] !== null && user[field] !== ""
+    );
+
+    res.status(200).json({ basicInfoSubmitted: isComplete });
+  } catch (err) {
+    console.error("Error checking basic info:", err);
+    res.status(500).json({ error: "Failed to check basic info" });
+  }
+});
+
 // Get a user by phone number
 router.get("/Phone/:phone", async (req, res) => {
   try {
@@ -114,7 +160,6 @@ router.post("/Login", async (req, res) => {
     res.status(500).json({ error: "Error during login" });
   }
 });
-
 
 // PUT route to update user data by phone number
 router.put("/Phone/:phone", async (req, res) => {
