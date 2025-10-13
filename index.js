@@ -6,6 +6,7 @@ const cors = require("cors");
 const { connectDB } = require("./config/db");
 
 const Users = require("./Routes/Users/Users");
+const NomineeInfo = require("./Routes/NomineeInfo/NomineeInfo");
 
 require("dotenv").config();
 const app = express();
@@ -30,6 +31,8 @@ app.use(express.json());
 connectDB();
 
 app.use("/Users", Users);
+
+app.use("/NomineeInfo", NomineeInfo);
 
 // Root health-check
 app.get("/", (req, res) => {
