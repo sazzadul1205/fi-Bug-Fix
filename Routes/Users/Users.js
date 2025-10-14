@@ -184,10 +184,17 @@ router.post("/Login", async (req, res) => {
     if (!isMatch)
       return res.status(401).json({ message: "Password doesn't match" });
 
-    res
-      .status(200)
-      .json({ success: true, message: "Login successful", phone: user.phone });
+    // Include role if exists
+    const role = user.role === "admin" ? "admin" : undefined;
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      phone: user.phone,
+      ...(role && { role }), // only add role if it exists
+    });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Error during login" });
   }
 });
@@ -215,6 +222,26 @@ router.put("/Phone/:phone", async (req, res) => {
   } catch (err) {
     console.error("Error updating user:", err);
     res.status(500).json({ error: "Failed to update user" });
+  }
+});
+
+// Delete user by ID
+router.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await UsersCollection.deleteOne({ _id: new ObjectId(id) });
+
+    if (result.deletedCount === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    res
+      .status(200)
+      .json({ success: true, message: "User deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Failed to delete user" });
   }
 });
 
