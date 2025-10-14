@@ -119,6 +119,23 @@ router.get("/Phone/:phone", async (req, res) => {
   }
 });
 
+// Get user by phone (only return name)
+router.get("/NameByPhone/:phone", async (req, res) => {
+  const { phone } = req.params;
+
+  try {
+    const user = await UsersCollection.findOne({ phone });
+
+    if (user) {
+      return res.status(200).json({ name: user.name });
+    } else {
+      return res.status(200).json({});
+    }
+  } catch (err) {
+    return res.status(500).json({});
+  }
+});
+
 // Get one user by ID
 router.get("/:id", async (req, res) => {
   try {

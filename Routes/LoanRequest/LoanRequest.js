@@ -77,6 +77,34 @@ router.post("/", async (req, res) => {
   }
 });
 
+// Update loan request status
+router.put("/Status/:id", async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (!status) {
+    return res.status(400).json({ message: "Status is required" });
+  }
+
+  try {
+    const result = await LoanRequestCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { status } }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res
+        .status(404)
+        .json({ message: "Loan request not found or status unchanged" });
+    }
+
+    res.status(200).json({ message: "Status updated successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 // Update a loan request by ID
 router.put("/:id", async (req, res) => {
   try {
