@@ -7,6 +7,7 @@ const { connectDB } = require("./config/db");
 
 const Users = require("./Routes/Users/Users");
 const NomineeInfo = require("./Routes/NomineeInfo/NomineeInfo");
+const LoanRequest = require("./Routes/LoanRequest/LoanRequest");
 
 require("dotenv").config();
 const app = express();
@@ -33,6 +34,8 @@ connectDB();
 app.use("/Users", Users);
 
 app.use("/NomineeInfo", NomineeInfo);
+
+app.use("/LoanRequest", LoanRequest);
 
 // Root health-check
 app.get("/", (req, res) => {
