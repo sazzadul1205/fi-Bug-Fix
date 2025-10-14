@@ -19,6 +19,23 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Get loan requests by phone number
+router.get("/Phone/:phone", async (req, res) => {
+  try {
+    const { phone } = req.params; // get phone from route parameter
+
+    if (!phone) {
+      return res.status(400).json({ message: "Phone number is required" });
+    }
+
+    const loanRequests = await LoanRequestCollection.find({ phone }).toArray();
+    res.status(200).json(loanRequests);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 // Get a loan request by ID
 router.get("/:id", async (req, res) => {
   try {
