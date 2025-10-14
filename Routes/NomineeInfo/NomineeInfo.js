@@ -49,7 +49,10 @@ router.get("/NomineeInfoExistCheck/:phone", async (req, res) => {
 
     // Check if all required fields are present and not empty
     const isComplete = requiredFields.every(
-      (field) => nominee[field] !== undefined && nominee[field] !== null && nominee[field] !== ""
+      (field) =>
+        nominee[field] !== undefined &&
+        nominee[field] !== null &&
+        nominee[field] !== ""
     );
 
     res.status(200).json({ nomineeInfoSubmitted: isComplete });
@@ -59,6 +62,31 @@ router.get("/NomineeInfoExistCheck/:phone", async (req, res) => {
   }
 });
 
+// Get nominee by user_phone
+router.get("/Phone/:phone", async (req, res) => {
+  try {
+    const { phone } = req.params;
+
+    if (!phone) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User phone number is required" });
+    }
+
+    const nominee = await NomineeInfoCollection.findOne({ user_phone: phone });
+
+    if (!nominee) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Nominee not found" });
+    }
+
+    res.status(200).json(nominee);
+  } catch (error) {
+    console.error("Error fetching user by phone:", err);
+    res.status(500).json({ error: "Failed to get user" });
+  }
+});
 
 // Get single nominee by ID
 router.get("/:id", async (req, res) => {
@@ -101,6 +129,47 @@ router.post("/", async (req, res) => {
     res.status(201).json({ success: true, insertedId: result.insertedId });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Update nominee by user_phone
+router.put("/Phone/:phone", async (req, res) => {
+  try {
+    const { phone } = req.params;
+    const updateData = req.body;
+
+    // Validate phone param
+    if (!phone) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User phone number is required" });
+    }
+
+    // Update nominee by user_phone
+    const result = await NomineeInfoCollection.updateOne(
+      { user_phone: phone },
+      { $set: { ...updateData, updated_at: new Date() } }
+    );
+
+    // Check if any document matched
+    if (result.matchedCount === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Nominee not found" });
+    }
+
+    // Success response
+    res.status(200).json({
+      success: true,
+      message: "Nominee data updated successfully",
+    });
+  } catch (error) {
+    console.error("Error updating nominee by phone:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update nominee data",
+      error: error.message,
+    });
   }
 });
 
