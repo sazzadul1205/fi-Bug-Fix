@@ -21,18 +21,20 @@ router.get("/", async (req, res) => {
 // Check if user's basic info exists
 router.get("/UserBasicInfoExistCheck/:phone", async (req, res) => {
   try {
+    // Get phone from route parameter
     const { phone } = req.params;
 
+    // Validate phone
     if (!phone) {
       return res.status(400).json({ error: "Phone number is required" });
     }
 
+    // Find user by phone
     const user = await UsersCollection.findOne({ phone });
 
+    // If user not found
     if (!user) {
-      return res
-        .status(404)
-        .json({ error: "No user found with this phone number" });
+      return res.status(200).json({ nomineeInfoSubmitted: false });
     }
 
     // List of required basic fields
@@ -57,6 +59,7 @@ router.get("/UserBasicInfoExistCheck/:phone", async (req, res) => {
         user[field] !== undefined && user[field] !== null && user[field] !== ""
     );
 
+    // Send response
     res.status(200).json({ basicInfoSubmitted: isComplete });
   } catch (err) {
     console.error("Error checking basic info:", err);

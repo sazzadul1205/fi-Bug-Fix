@@ -23,8 +23,10 @@ router.get("/", async (req, res) => {
 // Check if nominee info exists for a user
 router.get("/NomineeInfoExistCheck/:phone", async (req, res) => {
   try {
+    // Get phone from route parameter
     const { phone } = req.params;
 
+    // Validate phone
     if (!phone) {
       return res.status(400).json({ error: "Phone number is required" });
     }
@@ -32,8 +34,9 @@ router.get("/NomineeInfoExistCheck/:phone", async (req, res) => {
     // Find nominee by user phone
     const nominee = await NomineeInfoCollection.findOne({ user_phone: phone });
 
+    // If nominee not found
     if (!nominee) {
-      return res.status(404).json({ nomineeInfoSubmitted: false });
+      return res.status(200).json({ nomineeInfoSubmitted: false });
     }
 
     // List of required nominee fields
@@ -55,6 +58,7 @@ router.get("/NomineeInfoExistCheck/:phone", async (req, res) => {
         nominee[field] !== ""
     );
 
+    // Return response
     res.status(200).json({ nomineeInfoSubmitted: isComplete });
   } catch (err) {
     console.error("Error checking nominee info:", err);
