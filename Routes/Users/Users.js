@@ -79,9 +79,8 @@ router.get("/BankInfoExistCheck/:phone", async (req, res) => {
     const user = await UsersCollection.findOne({ phone });
 
     if (!user) {
-      return res
-        .status(404)
-        .json({ error: "No user found with this phone number" });
+      // If user not found, bank info obviously not submitted
+      return res.status(200).json({ bankInfoSubmitted: false });
     }
 
     // Check if BillInfo exists and has valid data
@@ -91,6 +90,7 @@ router.get("/BankInfoExistCheck/:phone", async (req, res) => {
         ? bankInfo.every((info) => Object.keys(info).length > 0)
         : false;
 
+    // Send response
     res.status(200).json({ bankInfoSubmitted });
   } catch (err) {
     console.error("Error checking bank info:", err);
