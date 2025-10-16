@@ -20,7 +20,7 @@ app.use(
       "http://192.168.0.11:5173",
       "http://192.168.0.105:5173",
       "http://192.168.0.3:5173",
-      "https://master-job-shop-server-qwbp5hp6w-sazzadul-islams-projects.vercel.app/",
+      "https://sass-micro-finance.web.app",
     ],
     credentials: true,
   })
