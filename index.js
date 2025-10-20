@@ -21,6 +21,7 @@ app.use(
       "http://192.168.0.105:5173",
       "http://192.168.0.3:5173",
       "https://sass-micro-finance.web.app",
+      "https://sass-micro-finance-a9eeb.web.app",
     ],
     credentials: true,
   })
