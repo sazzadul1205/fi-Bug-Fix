@@ -3,7 +3,8 @@ const { MongoClient, ServerApiVersion } = require("mongodb");
 require("dotenv").config();
 
 // MongoDB connection URI using environment variables for user and password
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.8ah2irm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.rd4aoch.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+
 // Create a new MongoClient instance with the provided URI and server API version
 const client = new MongoClient(uri, {
   serverApi: {
